@@ -120,12 +120,13 @@ with tab1:
         st.markdown('<div class="glass-card">', unsafe_allow_html=True)
         st.subheader("Prediction Confidence Distribution")
 
-        fig, ax = plt.subplots()
-        ax.bar(class_names, probabilities)
-        ax.set_ylabel("Confidence (%)")
-        ax.set_xticklabels(class_names, rotation=45, ha='right')
-        ax.set_ylim([0, 100])
-        st.pyplot(fig)
+        fig_prob, ax_prob = plt.subplots()
+        ax_prob.bar(class_names, probabilities)
+        ax_prob.set_ylabel("Confidence (%)")
+        ax_prob.set_xticks(range(len(class_names)))
+        ax_prob.set_xticklabels(class_names, rotation=45, ha='right')
+        ax_prob.set_ylim([0, 100])
+        st.pyplot(fig_prob)
 
         st.markdown('</div>', unsafe_allow_html=True)
 
@@ -150,12 +151,25 @@ with tab2:
         df = pd.DataFrame(st.session_state.history)
         st.dataframe(df)
 
+        # 🔥 ALWAYS VISIBLE CONFIDENCE TREND
         st.subheader("Confidence Trend")
-        fig, ax = plt.subplots()
-        ax.plot(df["Confidence"])
-        ax.set_ylabel("Confidence %")
-        ax.set_xlabel("Prediction Index")
-        st.pyplot(fig)
+
+        fig_trend, ax_trend = plt.subplots()
+
+        ax_trend.plot(
+            range(1, len(df["Confidence"]) + 1),
+            df["Confidence"],
+            marker='o',
+            linewidth=2
+        )
+
+        ax_trend.set_xlabel("Prediction Number")
+        ax_trend.set_ylabel("Confidence (%)")
+        ax_trend.set_ylim(0, 100)
+        ax_trend.set_xlim(1, max(1, len(df)))
+        ax_trend.grid(True)
+
+        st.pyplot(fig_trend)
 
         csv = df.to_csv(index=False).encode('utf-8')
         st.download_button(
@@ -164,8 +178,9 @@ with tab2:
             "fruit_prediction_report.csv",
             "text/csv"
         )
+
     else:
-        st.info("No predictions yet.")
+        st.info("Upload an image to start analytics.")
 
     st.markdown('</div>', unsafe_allow_html=True)
 
