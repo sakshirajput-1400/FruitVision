@@ -12,49 +12,50 @@ MODEL_ACCURACY = 94.0
 
 st.set_page_config(page_title="FruitVision", layout="wide")
 
-# ---------------- FIXED UI STYLE (VISIBLE TEXT) ----------------
+# ---------------- STRONG VISIBILITY FIX ----------------
 st.markdown("""
 <style>
 
-/* Background */
+/* App Background */
 [data-testid="stAppViewContainer"] {
-    background: linear-gradient(135deg, #eef2f7, #ffffff);
+    background: linear-gradient(135deg, #f4f7fb, #ffffff);
 }
 
-/* Force all text dark */
-html, body, [class*="css"] {
+/* Force ALL text dark */
+html, body, div, p, span, label {
     color: #111111 !important;
 }
 
 /* Headings */
 h1, h2, h3, h4, h5, h6 {
     color: #111111 !important;
-}
-
-/* Paragraph text */
-p {
-    color: #222222 !important;
+    font-weight: 700 !important;
 }
 
 /* Tabs */
 button[data-baseweb="tab"] {
     color: #111111 !important;
-    font-weight: 600;
+    font-weight: 600 !important;
 }
 
-/* Metrics */
+/* Sidebar text (if used later) */
+section[data-testid="stSidebar"] * {
+    color: #111111 !important;
+}
+
+/* Markdown containers */
+[data-testid="stMarkdownContainer"] {
+    color: #111111 !important;
+}
+
+/* Metric styling */
 [data-testid="stMetricValue"] {
     color: #111111 !important;
-    font-weight: 700;
+    font-weight: bold;
 }
 
 [data-testid="stMetricLabel"] {
     color: #333333 !important;
-}
-
-/* Labels */
-label {
-    color: #111111 !important;
 }
 
 /* Glass Card */
@@ -131,12 +132,10 @@ with tab1:
         with col1:
             st.image(image, caption="Input Image", use_column_width=True)
 
-        # Preprocess
         image_resized = image.resize((IMG_SIZE, IMG_SIZE))
         img_array = np.array(image_resized) / 255.0
         img_array = np.expand_dims(img_array, axis=0)
 
-        # Prediction
         prediction = model.predict(img_array)
         probabilities = prediction[0] * 100
         predicted_class = class_names[np.argmax(prediction)]
@@ -172,7 +171,6 @@ with tab1:
 
         st.markdown('</div>', unsafe_allow_html=True)
 
-        # Save History
         if "history" not in st.session_state:
             st.session_state.history = []
 
@@ -193,11 +191,9 @@ with tab2:
         df = pd.DataFrame(st.session_state.history)
         st.dataframe(df)
 
-        # Confidence Trend
         st.subheader("Confidence Trend")
 
         fig_trend, ax_trend = plt.subplots()
-
         ax_trend.plot(
             range(1, len(df["Confidence"]) + 1),
             df["Confidence"],
@@ -208,32 +204,13 @@ with tab2:
         ax_trend.set_xlabel("Prediction Number")
         ax_trend.set_ylabel("Confidence (%)")
         ax_trend.set_ylim(0, 100)
-        ax_trend.set_xlim(1, max(1, len(df)))
         ax_trend.grid(True)
 
         st.pyplot(fig_trend)
 
-        csv = df.to_csv(index=False).encode('utf-8')
-        st.download_button(
-            "Download Report",
-            csv,
-            "fruit_prediction_report.csv",
-            "text/csv"
-        )
-
     else:
         st.info("Upload an image to start analytics.")
 
-    st.markdown('</div>', unsafe_allow_html=True)
-
-    # Static Metrics
-    st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-    st.subheader("Model Evaluation Metrics")
-    st.write(f"Overall Accuracy: {MODEL_ACCURACY}%")
-    st.write("Precision: 93%")
-    st.write("Recall: 92%")
-    st.write("F1 Score: 92%")
-    st.info("Evaluation metrics calculated during training phase.")
     st.markdown('</div>', unsafe_allow_html=True)
 
 # ================= ABOUT TAB =================
@@ -243,28 +220,28 @@ with tab3:
 
     st.header("Project Overview")
     st.write("""
-    FruitVision is an end-to-end AI-powered fruit quality detection system.
+FruitVision is an end-to-end AI-powered fruit quality detection system.
 
-    It uses Transfer Learning (MobileNetV2) to classify fruits
-    as Fresh or Rotten using deep learning.
-    """)
+It uses Transfer Learning (MobileNetV2) to classify fruits
+as Fresh or Rotten using deep learning.
+""")
 
     st.header("Features")
     st.write("""
-    - Real-time fruit classification
-    - Camera support
-    - Confidence visualization
-    - Price estimation
-    - Prediction history tracking
-    - Interactive analytics dashboard
-    """)
+- Real-time fruit classification  
+- Camera support  
+- Confidence visualization  
+- Price estimation  
+- Prediction history tracking  
+- Interactive analytics dashboard  
+""")
 
     st.header("Future Scope")
     st.write("""
-    - Supermarket automation
-    - Mobile deployment
-    - IoT-based fruit inspection
-    - Smart inventory integration
-    """)
+- Supermarket automation  
+- Mobile deployment  
+- IoT-based fruit inspection  
+- Smart inventory integration  
+""")
 
     st.markdown('</div>', unsafe_allow_html=True)
