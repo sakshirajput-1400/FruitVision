@@ -12,19 +12,61 @@ MODEL_ACCURACY = 94.0
 
 st.set_page_config(page_title="FruitVision", layout="wide")
 
-# ---------------- UI STYLE ----------------
+# ---------------- FIXED UI STYLE (VISIBLE TEXT) ----------------
 st.markdown("""
 <style>
+
+/* Background */
 [data-testid="stAppViewContainer"] {
-    background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+    background: linear-gradient(135deg, #eef2f7, #ffffff);
 }
+
+/* Force all text dark */
+html, body, [class*="css"] {
+    color: #111111 !important;
+}
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+    color: #111111 !important;
+}
+
+/* Paragraph text */
+p {
+    color: #222222 !important;
+}
+
+/* Tabs */
+button[data-baseweb="tab"] {
+    color: #111111 !important;
+    font-weight: 600;
+}
+
+/* Metrics */
+[data-testid="stMetricValue"] {
+    color: #111111 !important;
+    font-weight: 700;
+}
+
+[data-testid="stMetricLabel"] {
+    color: #333333 !important;
+}
+
+/* Labels */
+label {
+    color: #111111 !important;
+}
+
+/* Glass Card */
 .glass-card {
     background: white;
     padding: 25px;
     border-radius: 15px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
     margin-bottom: 20px;
+    color: #111111 !important;
 }
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -116,7 +158,7 @@ with tab1:
 
             st.markdown('</div>', unsafe_allow_html=True)
 
-        # 🔥 Probability Distribution Graph (Per Image)
+        # Probability Graph
         st.markdown('<div class="glass-card">', unsafe_allow_html=True)
         st.subheader("Prediction Confidence Distribution")
 
@@ -151,7 +193,7 @@ with tab2:
         df = pd.DataFrame(st.session_state.history)
         st.dataframe(df)
 
-        # 🔥 ALWAYS VISIBLE CONFIDENCE TREND
+        # Confidence Trend
         st.subheader("Confidence Trend")
 
         fig_trend, ax_trend = plt.subplots()
