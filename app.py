@@ -12,7 +12,7 @@ MODEL_ACCURACY = 94.0
 
 st.set_page_config(page_title="FruitVision", layout="wide")
 
-# ---------------- PREMIUM UI ----------------
+# ---------------- UI STYLE ----------------
 st.markdown("""
 <style>
 [data-testid="stAppViewContainer"] {
@@ -89,13 +89,16 @@ with tab1:
         with col1:
             st.image(image, caption="Input Image", use_column_width=True)
 
+        # Preprocess
         image_resized = image.resize((IMG_SIZE, IMG_SIZE))
         img_array = np.array(image_resized) / 255.0
         img_array = np.expand_dims(img_array, axis=0)
 
+        # Prediction
         prediction = model.predict(img_array)
+        probabilities = prediction[0] * 100
         predicted_class = class_names[np.argmax(prediction)]
-        confidence = float(np.max(prediction))
+        confidence = float(np.max(probabilities))
         price_value = prices.get(predicted_class, 0)
 
         with col2:
@@ -107,11 +110,24 @@ with tab1:
                 st.error("Rotten Fruit Detected")
 
             st.write(f"Prediction: {predicted_class}")
-            st.progress(confidence)
-            st.write(f"Confidence: {round(confidence*100,2)}%")
+            st.progress(confidence / 100)
+            st.write(f"Confidence: {round(confidence,2)}%")
             st.write(f"Estimated Market Price: ₹{price_value} per kg")
 
             st.markdown('</div>', unsafe_allow_html=True)
+
+        # 🔥 Probability Distribution Graph (Per Image)
+        st.markdown('<div class="glass-card">', unsafe_allow_html=True)
+        st.subheader("Prediction Confidence Distribution")
+
+        fig, ax = plt.subplots()
+        ax.bar(class_names, probabilities)
+        ax.set_ylabel("Confidence (%)")
+        ax.set_xticklabels(class_names, rotation=45, ha='right')
+        ax.set_ylim([0, 100])
+        st.pyplot(fig)
+
+        st.markdown('</div>', unsafe_allow_html=True)
 
         # Save History
         if "history" not in st.session_state:
@@ -119,7 +135,7 @@ with tab1:
 
         st.session_state.history.append({
             "Prediction": predicted_class,
-            "Confidence": round(confidence*100,2),
+            "Confidence": round(confidence,2),
             "Price": price_value
         })
 
@@ -153,16 +169,14 @@ with tab2:
 
     st.markdown('</div>', unsafe_allow_html=True)
 
-    # Static Model Evaluation (Cloud Safe)
+    # Static Metrics
     st.markdown('<div class="glass-card">', unsafe_allow_html=True)
     st.subheader("Model Evaluation Metrics")
-
     st.write(f"Overall Accuracy: {MODEL_ACCURACY}%")
     st.write("Precision: 93%")
     st.write("Recall: 92%")
     st.write("F1 Score: 92%")
     st.info("Evaluation metrics calculated during training phase.")
-
     st.markdown('</div>', unsafe_allow_html=True)
 
 # ================= ABOUT TAB =================
@@ -185,7 +199,7 @@ with tab3:
     - Confidence visualization
     - Price estimation
     - Prediction history tracking
-    - Analytics dashboard
+    - Interactive analytics dashboard
     """)
 
     st.header("Future Scope")
